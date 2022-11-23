@@ -1,0 +1,1 @@
+select * from customer as c1,customer_address as ca1,customer_address as ca2,catalog_sales as cs where c1.c_current_addr_sk = ca1.ca_address_sk and ca2.ca_address_sk = cs.cs_bill_addr_sk and c1.c_customer_sk = cs.cs_bill_customer_sk and ca1.ca_state = ANY ('{TN,IL,GA,MO,CO,OH,NM}') and  ca2.ca_state = ANY ('{TN,IL,GA,MO,CO,OH,NM}') ;
