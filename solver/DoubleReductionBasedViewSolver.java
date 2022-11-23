@@ -5120,10 +5120,6 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 }
 
     
-
-		
-	
-		
     private List<LinkedList<VariableValuePair>> formulateAndSolve(List<FormalCondition> conditions, List<Region> conditionRegions, FormalCondition consistencyConstraints[]
     		, ConsistencyMakerType consistencyMakerType) {
     	
@@ -5427,74 +5423,11 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
     }
 	
 	
-
+    // changes by manish
 	public List<LinkedList<VariableValuePair>> formAndSolveLP1(ConsistencyMakerType consistencyMakerType,FormalCondition[] consistencyConstraints, 
 							List<FormalCondition> conditions, HashMap<Set<String>, Set<String>> cliquesToFKeyCoverage) {
 		
-		
-
-		
-		
-		/////////////// Start dk
-			  /* Compare partitions
-			  CliqueComparator cliqueComparator = new CliqueComparator(viewname);
-			  cliqueComparator.comparePartitions(cliqueIdxtoPList);
-			  /**/
-			  
-			//  Map<String, String> contextmaptest = new HashMap<>();
-			//  contextmaptest.put("model", "true");
-			//  contextmaptest.put("unsat_core", "true");
-			//  Context ctxtest = new Context(contextmaptest);
-			//
-			//  Optimize osolver = ctxtest.mkOptimize();
-			//  IntExpr x = ctxtest.mkIntConst("x");
-			//  IntExpr y = ctxtest.mkIntConst("y");
-			//  ArithExpr arithexpr = ctxtest.mkAdd(x, y);
-			//  osolver.Add(ctxtest.mkGt(arithexpr, ctxtest.mkInt(10)));
-			//  osolver.Add(ctxtest.mkLt(arithexpr, ctxtest.mkInt(20)));
-			//  
-			//  osolver.MkMaximize(arithexpr);
-			//  
-			//  osolver.Check();
-			//  
-			//  Model modeltest = osolver.getModel();
-			//  System.out.println(modeltest.evaluate(x, true) + " : " + modeltest.evaluate(y, true));
-			///////////////// End dk
-			  //change by manish starts
-//					try {
-//						GRBEnv env = new GRBEnv();
-//						GRBModel model = new GRBModel(env);
-//						String x[] = new String[] {"x", "y"};
-//						GRBVar[] vars = new GRBVar[3];
-//						for(int j=0; j<2; j++)
-//						{
-//							vars[j] = model.addVar(0, GRB.INFINITY, 0, GRB.CONTINUOUS, x[j]);
-//						}
-//						
-//						double A[][] = new double[][] {{1,1}, {1,-1}};
-//						double b[] = new double[] {8,4};
-//						int nConstraints = 2;
-//						for(int i = 0; i<nConstraints; i++)
-//						{
-//							GRBLinExpr expr = new GRBLinExpr();
-//							for(int j=0; j<2; j++)
-//							{
-//								expr.addTerm(A[i][j], vars[j]);
-//							}
-//							model.addConstr(expr, GRB.EQUAL, b[i], x[i]);
-//						}
-//						model.optimize();
-//						for(int i =0; i<2; i++)
-//						{
-//							System.out.println(vars[i].get(GRB.StringAttr.VarName) + " " +vars[i].get(GRB.DoubleAttr.X));
-//						}
-//						env.dispose();
-//					}
-//					catch(GRBException e) {
-//						System.out.println("Error code: " + e.getErrorCode()+". " + e.getMessage());
-//					}
-				//change by manish stops
-			  StopWatch onlyFormationSW = new StopWatch("LP-OnlyFormation" + viewname);
+			StopWatch onlyFormationSW = new StopWatch("ByMJ LP-OnlyFormation" + viewname);
 			  
 			  Map<String, String> contextmap = new HashMap<>();
 			  contextmap.put("model", "true");
@@ -5503,12 +5436,7 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 			
 			//Solver solver = ctx.mkSolver();
 			  Optimize solver = ctx.mkOptimize();
-			  
-			  //adding expression for optimization function -- Anupam
-			  //start
-			  //ArithExpr exp_final = ctx.mkIntConst("");
-			  //stop
-			  
+			  			  
 			  List<List<List<IntExpr>>> solverConstraintsRequiredForConsistency = new ArrayList<>();
 			  int projectionVarsIndex = 0;
 			  List<HashMap<String, ProjectionStuffInColumn>> cliqueWColumnWProjectionStuff = new ArrayList<>();
@@ -5538,18 +5466,7 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 			      for (int blockIndex = 0; blockIndex < partition.size(); blockIndex++) {
 			          String varname = "var" + cliqueIndex + "_" + blockIndex;
 			          solverStats.solverVarCount++;
-			
-			        //adding expression for computing l2 norm -- Anupam
-			          //start
-			          //IntExpr expr = ctx.mkIntConst(varname);
-			          //L1 norm minimization
-			          //exp_final = ctx.mkAdd(exp_final, expr);
-			          //L2 norm minimization
-			          //exp_final = ctx.mkAdd(exp_final, ctx.mkMul(expr, expr));
-			          //stop
-			          
-			          
-			          
+			       
 			          //Adding non-negativity constraints
 			          solver.Add(ctx.mkGe(ctx.mkIntConst(varname), ctx.mkInt(0)));
 			
@@ -5575,8 +5492,6 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 			          solverConstraintsToExport.add(solverConstraints.get(bvalues.size() - 1));   // Clique size
 			          solverConstraintsRequiredForConsistency.add(solverConstraintsToExport);
 			      }
-			      
-
 			  }
 			
 			///////////////// Start dk
@@ -5778,10 +5693,7 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 			  if (objective != null)
 			  	solver.MkMinimize(objective);
 			  
-			///////////////// End dk
-			  
-			  
-			
+			///////////////// End dk			
 			  List<String> allIntervalRegions = new ArrayList<>(); // List of all intervals
 			  List<String> allIntervalisedRegions = new ArrayList<>(); // List of all intervalised regions
 			  List<String> allDxValues = new ArrayList<>();
@@ -5793,9 +5705,7 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 			 Map<String, List<String>> allDxValuesVariables = new HashMap<>();
 			 Map<String, List<String>> allIntervalisedRegionsVariables = new HashMap<>();
 			 Map<String, HashMap<String, List<Integer>>> varToIntervalMapPerFKey = new HashMap<>();
-			 
-			  
-			  
+			 			  
 			  if(PostgresVConfig.fkeyToBorrowedAttr.containsKey(viewname)) {
 				  
 				  				  
@@ -5820,10 +5730,8 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 							  currentClique = clique;
 							  currentCliqueIdx = c;
 							  break;
-						  }
-						  
-					  }
-					  
+						  }						  
+					  }					  
 					  if(currentClique == null) {
 						  throw new RuntimeException("Something wrong can't be possible");
 					  }
@@ -5861,15 +5769,12 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 									intervals.addAll((bs.at(bucket).getAll()));
 									
 								}
-								
-								
 							}
 							noOfIntervalRegions*=intervals.size();
 							ArrayList<Integer> intervalsList = new ArrayList<>(intervals);
 							Collections.sort(intervalsList);
 							borrowedAttrIntervals.add(intervalsList);
-							
-					  }
+							}
 					  
 					  List<List<Integer>> intervalRegions = new ArrayList<>();
 					    for(int i=0; i < noOfIntervalRegions; i++) {
@@ -5906,9 +5811,7 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 								}
 								row = row + 1;
 								count*=currentRowSize;
-					    		
-					    		
-					    		
+					    							    		
 					    	}
 					    	else {
 					    		
@@ -5926,14 +5829,9 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 					    		
 					    		count = currentRowSize;
 								row = row + 1;
-					    			
-					    		
-					    	}
-					    		
-					    	
-					    	
-					    }
-					    
+					    								    		
+					    	}					    	
+					    }				    
 					    
 					    HashMap<Integer, String> Z3name = new HashMap<>();
 					    for(int i=0; i< intervalRegions.size();i ++) {
@@ -5993,7 +5891,6 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 						    				
 						    				break;
 						    			}
-						    			
 						    		}
 						    		
 						    		if(c == borrowedAttrIdx.size()) {
@@ -6050,9 +5947,7 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 					    	// sum  of intervalised regions = var
 					    	solver.Add(ctx.mkEq(ctx.mkAdd(regionPartitionArray), ctx.mkIntConst(regionName)));
 					    	
-					    }
-					    
-					    
+					    }					    
 					    
 					    System.out.print("");
 					    
@@ -6068,18 +5963,13 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 					    	}
 					    	
 					    	solver.Add(ctx.mkEq( ctx.mkAdd(regionArray), ctx.mkIntConst(Z3name.get(intervalIdx))));
-					    	
-					    	
-					    }
-					    
-					    
-					    
+					    					    	
+					    }					    
 					    
 					    JSONArray dfVector = PostgresVConfig.fkeySkewVectors.getJSONObject(viewname).getJSONArray(fkey);
 				    	JSONArray d = dfVector.getJSONArray(0);
 						JSONArray f = dfVector.getJSONArray(1);
-						
-						
+												
 						for(Integer i = 0; i < intervalRegions.size(); i++) {
 							ArithExpr[] dxSumm = new ArithExpr[d.length()];
 							for(int d_i=0; d_i < d.length(); d_i++){
@@ -6108,18 +5998,9 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 				    		}
 				    		
 				    	 solver.Add(ctx.mkEq(ctx.mkAdd(xfSumm),ctx.mkInt(f.getInt(d_i))));
-				    		
 				    	}
-					    
-					  
-					  
-					  
-					  
-				  }
-					  
-			  
-				  
-				  
+					}
+									  
 				  // Adding equations for CCs skew
 				  
 				  Map<String, Map<String, Set<String>>> fkeyToBR = PostgresVConfig.fkeyToBorrowedAttr;
@@ -6188,51 +6069,30 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 						  
 						 solver.Add(ctx.mkGe(ctx.mkAdd(dxArray),ctx.mkInt(fVal - fCount)));
 						 fCount += fVal;
-						  
-						  
-					  }
-					  
+						  						  
+					  }					  
 					  System.out.print("");
-					  
-				  }
+				}
+			}
+			}
 				  
-				  
-			  
-			  }
-			  
-			  
-			
-			  
-			  }
-			  
-			  
-			  
-			  
-			  // Adding an optimization function to the solver -- Anupam
-			  //start
-			  //solver.MkMinimize(exp_final);
-			  //stop
-			 
-			  
 			  onlyFormationSW.displayTimeAndDispose();
-			  
-			   
-			  
+			  			  
 			  //Dumping LP into a file -- Anupam
 			  //start
-			  FileWriter fw;
-				try {
-					fw = new FileWriter("lpfile-"+viewname+".txt");
-					fw.write(solver.toString());
-			      fw.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} 
-			  System.err.println(solver.toString());
+//			  FileWriter fw;
+//				try {
+//					fw = new FileWriter("lpfile-"+viewname+".txt");
+//					fw.write(solver.toString());
+//			      fw.close();
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} 
+//			  System.err.println(solver.toString());
 			  //stop
 			  
-			  StopWatch onlySolvingSW = new StopWatch("LP-OnlySolving" + viewname);
+			  StopWatch onlySolvingSW = new StopWatch("ByMJ LP-OnlySolving" + viewname);
 			  
 			  Status solverStatus = solver.Check();
 			  DebugHelper.printInfo("Solver Status: " + solverStatus);
@@ -6241,9 +6101,11 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 			  	ctx.close();
 			      throw new RuntimeException("solverStatus is not SATISFIABLE");
 			  }
-			
+			  			  
 			  Model model = solver.getModel();
-			
+			  
+			  onlySolvingSW.displayTimeAndDispose();
+			  
 			  List<LinkedList<VariableValuePair>> cliqueIdxToVarValuesList = new ArrayList<>(cliqueCount);
 			  for (int i = 0; i < cliqueCount; i++) {
 			
@@ -6252,33 +6114,9 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 			      LinkedList<VariableValuePair> varValuePairs = new LinkedList<>();
 			      for (int j = 0; j < partition.size(); j++) {
 			          String varname = "var" + i + "_" + j;
-			          
-			          //Variable to column indices mapping -- Anupam
-			          //start
-			          FileWriter fw1;
-			  		try {
-			  			fw1 = new FileWriter(viewname+"-var-to-colindices.txt", true);
-			  			fw1.write(varname+" "+colIndxs.toString()+ "\n");
-			  	        fw1.close();
-			  		} catch (IOException e) {
-			  			// TODO Auto-generated catch block
-			  			e.printStackTrace();
-			  		} 
-			  		  //stop
-			          //System.err.println(varname+colIndxs.toString());
-			          long rowcount = Long.parseLong(model.evaluate(ctx.mkIntConst(varname), true).toString());
-			         //Variable to value mapping -- Anupam
-			         //start
-			          FileWriter fw2;
-			  		try {
-			  			fw2 = new FileWriter(viewname+"-var-to-value.txt", true);
-			  			fw2.write(varname+" "+rowcount+ "\n");
-			  	        fw2.close();
-			  		} catch (IOException e) {
-			  			// TODO Auto-generated catch block
-			  			e.printStackTrace();
-			  		} 
-			  		//stop
+			       
+			  		  long rowcount = Long.parseLong(model.evaluate(ctx.mkIntConst(varname), true).toString());
+			       
 			          if (rowcount != 0) {
 			              Region variable = getTruncatedRegion(partition.at(j), colIndxs);
 			              VariableValuePair varValuePair = new VariableValuePair(variable, rowcount);
@@ -6307,18 +6145,11 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 					  if(!this.fkeyToIntervalRegionMap.containsKey(fkey)) {
 						  this.fkeyToIntervalRegionMap.put(fkey, new ArrayList<>());
 					  }
-					  this.fkeyToIntervalRegionMap.get(fkey).add(interval);
-					  
-					  
-				  }
-				  
-				  
+					  this.fkeyToIntervalRegionMap.get(fkey).add(interval);					  
+				  }				  
 				  long sumOfIntervalisedRegion = 0;
-				  
-				  
+				  				  
 				  for(int i=0; i < allIntervalisedRegions.size(); i++ ) {
-					  
-					  
 					  long val = Long.parseLong(model.evaluate(ctx.mkIntConst(allIntervalisedRegions.get(i)), true).toString());
 					  if(val==0) {
 						  continue;
@@ -6339,11 +6170,9 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 						  varToIntervalisedRegionMapPerFkey.get(fkey).put(varname,new ArrayList<>());
 					  }
 					  varToIntervalisedRegionMapPerFkey.get(fkey).get(varname).add(intervalisedRegion);
-					  
-					  
+										  
 				  }
-				  
-				  
+				  				  
 				  for(int i=0; i < allDxValues.size(); i++) {
 					  //t17_c018_interval_0_d_0
 					  long val = Long.parseLong(model.evaluate(ctx.mkIntConst(allDxValues.get(i)), true).toString());
@@ -6366,10 +6195,6 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 				  }
 			  }
 			  
-			  
-			 
-			  
-			  onlySolvingSW.displayTimeAndDispose();
 			/*        
 			  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			  // DIRTY START DIRTY START DIRTY START DIRTY START DIRTY START DIRTY START DIRTY START DIRTY START DIRTY START DIRTY START DIRTY START 
@@ -6650,7 +6475,8 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 	
 	public List<LinkedList<VariableValuePair>> formAndSolveLP(ConsistencyMakerType consistencyMakerType,FormalCondition[] consistencyConstraints, 
 			List<FormalCondition> conditions, HashMap<Set<String>, Set<String>> cliquesToFKeyCoverage) {
-		StopWatch onlyFormationSW = new StopWatch("LP-OnlyFormation" + viewname);
+		
+		StopWatch onlyFormationSW = new StopWatch("ByMJ LP-OnlyFormation" + viewname);
 		
 		Map<String, String> contextmap = new HashMap<>();
 //		contextmap.put("model", "true");
@@ -6659,6 +6485,8 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 
 //		//Solver solver = ctx.mkSolver();
 //		Optimize solver = ctx.mkOptimize();
+		List<LinkedList<VariableValuePair>> cliqueIdxToVarValuesList = new ArrayList<>(cliqueCount);
+		
 		try {
 			GRBEnv env = new GRBEnv();
 			GRBModel model = new GRBModel(env);
@@ -6704,7 +6532,7 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 	//				solver.Add(ctx.mkGe(ctx.mkIntConst(varname), ctx.mkInt(0)));
 	
 					
-					vars[blockIndex] = model.addVar(0, GRB.INFINITY, 0, GRB.CONTINUOUS, varname);
+					vars[blockIndex] = model.addVar(0, GRB.INFINITY, 0, GRB.INTEGER, varname);
 					for (IntIterator iter = conditionIdxsList.get(blockIndex).iterator(); iter.hasNext();) {
 						int k = iter.nextInt();
 						solverConstraints.get(k).add(vars[blockIndex]);
@@ -6724,7 +6552,7 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 					model.addConstr(expr, GRB.EQUAL, outputCardinality, "" );
 					solverStats.solverConstraintCount++;
 				}
-  
+				onlyFormationSW.displayTimeAndDispose();
 			///////////////// Start dk
 //			if (consistencyMakerType == ConsistencyMakerType.CONSISTENCYFILTERS) {
 //				List<List<IntExpr>> solverConstraintsToExport = new ArrayList<>(indexKeeper.size());
@@ -6735,16 +6563,17 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 //				solverConstraintsRequiredForConsistency.add(solverConstraintsToExport);
 //			}
 		}
+			StopWatch onlySolvingSW = new StopWatch("ByMJ LP-OnlySolving" + viewname);
+			
 			model.optimize();
-			for (int i =0; i<solverStats.solverVarCount; i++)
-			{
-				System.out.println(vars[i].get(GRB.StringAttr.VarName)+ " " + vars[i].get(GRB.DoubleAttr.X));
-			}
-			model.dispose();
-			env.dispose();
-		}catch(GRBException e) {
-			System.out.println("Error code: "+ e.getErrorCode() + ". " + e.getMessage());
-		}
+			
+			onlySolvingSW.displayTimeAndDispose();
+			
+//			for (int i =0; i<solverStats.solverVarCount; i++)
+//			{	
+//				System.out.println(vars[i].get(GRB.StringAttr.VarName)+ " " + vars[i].get(GRB.DoubleAttr.X));
+//			}
+			
 //
 //		///////////////// Start dk
 //		DebugHelper.printInfo("variablesRequiredForProjection: " + projectionVarsIndex);
@@ -7356,13 +7185,14 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 //
 //		Model model = solver.getModel();
 //
-		List<LinkedList<VariableValuePair>> cliqueIdxToVarValuesList = new ArrayList<>(cliqueCount);
-//		for (int i = 0; i < cliqueCount; i++) {
-//			IntList colIndxs = arasuCliquesAsColIndxs.get(i);
-//			Partition partition = cliqueIdxtoPList.get(i);
-//			LinkedList<VariableValuePair> varValuePairs = new LinkedList<>();
-//			for (int j = 0; j < partition.size(); j++) {
-//				String varname = "var" + i + "_" + j;
+		
+		
+		for (int i = 0; i < cliqueCount; i++) {
+			IntList colIndxs = arasuCliquesAsColIndxs.get(i);
+			Partition partition = cliqueIdxtoPList.get(i);
+			LinkedList<VariableValuePair> varValuePairs = new LinkedList<>();
+			for (int j = 0; j < partition.size(); j++) {
+				String varname = "var" + i + "_" + j;
 //      
 //				//Variable to column indices mapping -- Anupam
 //				//start
@@ -7378,26 +7208,16 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 //				//stop
 //				//System.err.println(varname+colIndxs.toString());
 //				long rowcount = Long.parseLong(model.evaluate(ctx.mkIntConst(varname), true).toString());
-//				//Variable to value mapping -- Anupam
-//				//start
-//				FileWriter fw2;
-//				try {
-//					fw2 = new FileWriter(viewname+"-var-to-value.txt", true);
-//					fw2.write(varname+" "+rowcount+ "\n");
-//					fw2.close();
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				} 
-//				//stop
-//				if (rowcount != 0) {
-//					Region variable = getTruncatedRegion(partition.at(j), colIndxs);
-//					VariableValuePair varValuePair = new VariableValuePair(variable, rowcount);
-//					varValuePairs.add(varValuePair);
-//				}
-//			}
-//			cliqueIdxToVarValuesList.add(varValuePairs);
-//		}
+				long rowcount = (long)vars[j].get(GRB.DoubleAttr.X);
+				if (rowcount != 0) {
+					Region variable = getTruncatedRegion(partition.at(j), colIndxs);
+					VariableValuePair varValuePair = new VariableValuePair(variable, rowcount);
+					varValuePairs.add(varValuePair);
+				}
+			}
+			cliqueIdxToVarValuesList.add(varValuePairs);
+		}
+	
 //
 //
 //		if(PostgresVConfig.hydraVersions.contains(PostgresVConfig.HydraTypes.duplicationHydra)) {
@@ -7474,6 +7294,12 @@ System.out.println("Memory used (formAndSolve)1: " + (memory2)/(1024.0*1024.0*10
 //		onlySolvingSW.displayTimeAndDispose();
 //
 //		ctx.close();
+		
+		model.dispose();
+		env.dispose();
+		}catch(GRBException e) {
+			System.out.println("Error code: "+ e.getErrorCode() + ". " + e.getMessage());
+		}
 		return cliqueIdxToVarValuesList;
 
 	}
